@@ -10,7 +10,7 @@ import UIKit
 import Foundation
 
 //MARK: emptyDelegate
-protocol PHTableViewEmpty {
+protocol PHTableViewEmptyDelegate {
     
     /// tableview data now
     func tableViewEmpty() -> Int
@@ -20,7 +20,7 @@ protocol PHTableViewEmpty {
 }
 
 //MARK: extension emptyDelegate
-extension PHTableViewEmpty {
+extension PHTableViewEmptyDelegate {
     
     func tableViewEmptyView(_ tableView: UITableView) -> UIView? {
         
@@ -32,7 +32,7 @@ extension PHTableViewEmpty {
 
 struct AssociatedKeys {
     
-    static var PHDelegate: PHTableViewEmpty?
+    static var PHDelegate: PHTableViewEmptyDelegate?
     
     static var PHEmptyView: UIView?
 }
@@ -55,12 +55,12 @@ extension UITableView {
         newReloadData()
     }
     
-    var PHDelegate: PHTableViewEmpty? {
+    var PHDelegate: PHTableViewEmptyDelegate? {
         set {
             objc_setAssociatedObject(self, &AssociatedKeys.PHDelegate, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
         get {
-            return objc_getAssociatedObject(self, &AssociatedKeys.PHDelegate) as? PHTableViewEmpty
+            return objc_getAssociatedObject(self, &AssociatedKeys.PHDelegate) as? PHTableViewEmptyDelegate
         }
     }
     

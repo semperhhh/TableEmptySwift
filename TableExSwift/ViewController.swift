@@ -47,7 +47,7 @@ class ViewController: UIViewController {
     lazy var tableview: UITableView = {
         
         let tableview = UITableView(frame: self.view.bounds, style: .plain)
-        tableview.swizzle()
+//        tableview.swizzle()//整个项目只调用一次即可,可以放到appdelegate
         tableview.backgroundColor = UIColor.white
         tableview.dataSource = self
         tableview.delegate = self
@@ -67,7 +67,7 @@ class ViewController: UIViewController {
     
 }
 
-extension ViewController: UITableViewDataSource, UITableViewDelegate, PHTableViewEmpty {
+extension ViewController: UITableViewDataSource, UITableViewDelegate, PHTableViewEmptyDelegate {
     
     func tableViewEmpty() -> Int {
         return self.dataList.count
@@ -85,11 +85,13 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate, PHTableVie
  */
     
     /// 默认的状态视图,text和img为nil则不展示
+    /*
     func tableViewEmptyView(_ tableView: UITableView) -> UIView? {
 
         let view: PHEmptyView = PHEmptyView().emptyText(nil).emptyImg(nil)
         return view
     }
+ */
 
  
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
