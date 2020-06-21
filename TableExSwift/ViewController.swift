@@ -53,7 +53,6 @@ class ViewController: UIViewController {
         tableview.delegate = self
         tableview.PHDelegate = self
         tableview.tableFooterView = UIView()
-        
         return tableview
     }()
     
@@ -73,8 +72,26 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate, PHTableVie
     func tableViewEmpty() -> Int {
         return self.dataList.count
     }
+
+    /* 自定义状态视图
+    func tableViewEmptyView(_ tableView: UITableView) -> UIView? {
+        
+        print("tableViewEmptyView")
+        
+        let v = UIView(frame: CGRect(x: tableView.bounds.width / 2 - 100, y: tableView.bounds.height / 2 - 200, width: 200, height: 200))
+        v.backgroundColor = UIColor.systemIndigo
+        return v
+    }
+ */
     
-    
+    /// 默认的状态视图,text和img为nil则不展示
+    func tableViewEmptyView(_ tableView: UITableView) -> UIView? {
+
+        let view: PHEmptyView = PHEmptyView().emptyText(nil).emptyImg(nil)
+        return view
+    }
+
+ 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.dataList.count
     }

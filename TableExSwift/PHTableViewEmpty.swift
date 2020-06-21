@@ -9,9 +9,25 @@
 import UIKit
 import Foundation
 
+//MARK: emptyDelegate
 protocol PHTableViewEmpty {
-
+    
+    /// tableview data now
     func tableViewEmpty() -> Int
+    
+    /// optianal, custom emptyView
+    func tableViewEmptyView(_ tableView: UITableView) -> UIView?
+}
+
+//MARK: extension emptyDelegate
+extension PHTableViewEmpty {
+    
+    func tableViewEmptyView(_ tableView: UITableView) -> UIView? {
+        
+        print("extension tableViewEmptyView")
+        
+        return PHEmptyView()
+    }
 }
 
 struct AssociatedKeys {
@@ -21,6 +37,7 @@ struct AssociatedKeys {
     static var PHEmptyView: UIView?
 }
 
+//MARK: extension tableview
 extension UITableView {
     
     func swizzle() {
@@ -47,6 +64,7 @@ extension UITableView {
         }
     }
     
+    /// emptyView, default is PHEmptyView
     var emptyView: UIView? {
         set {
             objc_setAssociatedObject(self, &AssociatedKeys.PHEmptyView, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
@@ -56,15 +74,16 @@ extension UITableView {
         }
     }
     
-    /// 判断是否空状态
+    /// whether show emptyView
     func emptyStatus() {
         
         print("数据个数", self.PHDelegate?.tableViewEmpty() ?? 0)
         
         let isEmpty: Bool = PHDelegate?.tableViewEmpty() ?? 0 > 0 ? false : true
   
-        if isEmpty {//空状态
-            emptyView == nil ? emptyView = PHEmptyView() : nil //防止多次创建
+        if isEmpty {//show emptyView
+            
+            emptyView = emptyView != nil ? emptyView : (self.PHDelegate?.tableViewEmptyView(self) != nil ? self.PHDelegate?.tableViewEmptyView(self) : UIView())
             self.addSubview(emptyView!)
         }else {
             emptyView?.removeFromSuperview()
@@ -72,9 +91,10 @@ extension UITableView {
     }
 }
 
+//MARK: PHEmptyView
 class PHEmptyView: UIView {
     
-    /// 空状态图片
+    /// empty image
     var emptyImgView: UIImageView = {
         let imgView = UIImageView()
         imgView.image = UIImage(named: "tableEmpty_img")
@@ -82,39 +102,58 @@ class PHEmptyView: UIView {
         return imgView
     }()
     
-    /// 空状态文字
+    /// empty text
     var emptyLab: UILabel = {
         let lab = UILabel()
-        lab.text = "暂无内容"
+        lab.text = "Empty Data"
         lab.textAlignment = NSTextAlignment.center
         lab.textColor = UIColor.systemGray2
         lab.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         return lab
     }()
     
-    var emptyString: String? {
+    /// show img, default is "tableEmpty_img", by value "nil" imageView is hidden.
+    /// - Parameter emptyImgString: img string
+    /// - Returns: self
+    func emptyImg(_ emptyImgString: String?) -> PHEmptyView {
         
-        didSet {
-            if emptyString != nil {
-                self.emptyLab.text = emptyString
-            }
+        if emptyImgString == nil {
+            self.emptyImgView.isHidden = true
+        } else {
+            self.emptyImgView.isHidden = false
+            self.emptyImgView.image = UIImage(named: emptyImgString!)
         }
+        return self
     }
     
-    var emptyImageString: String? {
+    /// show text, default is "Empty Data", by value "nil" label is Hidden.
+    /// - Parameter emptyString: text
+    /// - Returns: self
+    func emptyText(_ emptyString: String?) -> PHEmptyView {
         
-        didSet {
-            if emptyImageString != nil {
-                self.emptyImgView.image = UIImage(named: emptyImageString!)?.withTintColor(UIColor.systemGray2, renderingMode: .alwaysOriginal)
-            }
+        if emptyString == nil {
+            self.emptyLab.isHidden = true
+        } else {
+            self.emptyLab.isHidden = false
+            self.emptyLab.text = emptyString
         }
+        return self
     }
     
+    /// 重写init
+    init() {
+     
+        super.init(frame: CGRect(x: UIScreen.main.bounds.width / 2 - 50, y: UIScreen.main.bounds.height / 2 - 160, width: 100, height: 130))
+        
+        self.addSubview(emptyImgView)
+        self.addSubview(emptyLab)
+    }
+
     override init(frame: CGRect) {
         
         super.init(frame: frame)
         
-        //如果没有给位置
+        //if no frame
         if frame == CGRect.zero  {
             self.frame = CGRect(x: UIScreen.main.bounds.width / 2 - 50, y: UIScreen.main.bounds.height / 2 - 160, width: 100, height: 130)
         }
